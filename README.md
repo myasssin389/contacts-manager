@@ -25,18 +25,3 @@ A contacts app for Android, built with Kotlin, Jetpack Compose and Room for the 
 | Logic | `ui/ContactViewModel.kt` | ViewModel, StateFlow, coroutines |
 | Data | `data/` | Room (Entity, DAO, Database), DataStore |
 | Other apps | `intents/` | Implicit Intents, intent filters |
-
-## Team
-
-| Person | Area |
-| --- | --- |
-| Person 1 | Project setup, manifest, activities, README |
-| Person 2 | Room database |
-| Person 3 | Repository, ViewModel and settings |
-| Person 4 | Theme and contact list |
-| Person 5 | Detail and edit screens |
-| Person 6 | Intents to other apps and the photo picker |
-
-## Credit
-
-Inspired by [ContactList](https://github.com/ndenicolais/ContactList) by Nicola De Nicolais (MIT License, Copyright (c) 2023 Nicola De Nicolais).
