@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_call">Call</string>
+    <string name="action_sms">SMS</string>
+    <string name="action_email">Email</string>
+    <string name="action_map">Map</string>
+    <string name="action_share">Share</string>
+    <string name="share_chooser_title">Share contact</string>
+    <string name="share_phone">Phone: %1$s</string>
+    <string name="share_email">Email: %1$s</string>
+    <string name="share_city">City: %1$s</string>
+    <string name="no_app_found">No app on this phone can do that.</string>
+    <string name="add_photo">Add photo</string>
+    <string name="change_photo">Change photo</string>
+    <string name="photo_failed">Could not use that photo.</string>
+</resources>
