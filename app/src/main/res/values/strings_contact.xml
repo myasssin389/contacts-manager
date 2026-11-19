@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="new_contact">New contact</string>
+    <string name="edit_contact">Edit contact</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="back">Back</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="delete_title">Delete contact?</string>
+    <string name="delete_message">%1$s will be removed from your contacts.</string>
+    <string name="ok">OK</string>
+    <string name="clear">Clear</string>
+
+    <string name="label_name">Full name</string>
+    <string name="label_phone">Phone</string>
+    <string name="label_email">Email</string>
+    <string name="label_city">City</string>
+    <string name="label_birthday">Birthday</string>
+    <string name="label_group">Group</string>
+    <string name="no_group">None</string>
+    <string name="choose_birthday">Choose birthday</string>
+
+    <string name="error_name_required">Enter a name</string>
+    <string name="error_phone_required">Enter a phone number</string>
+    <string name="error_phone_invalid">Enter a valid phone number</string>
+    <string name="error_email_invalid">Enter a valid email address</string>
+</resources>
