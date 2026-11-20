@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -27,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -34,10 +36,12 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -76,13 +80,18 @@ fun ContactEditScreen(
     // Errors appear only after the first tap on Save, not while the user is still typing.
     var showErrors by rememberSaveable { mutableStateOf(false) }
     var showDatePicker by rememberSaveable { mutableStateOf(false) }
+    // true after a valid Save tap, while the screen is closing.
+    var isSaving by remember { mutableStateOf(false) }
 
     val errors = ContactValidator.validate(name, phone, email)
     val birthday = birthdayEpochDay?.let { day -> LocalDate.ofEpochDay(day) }
 
     fun save() {
+        // A second quick tap would save a new contact twice.
+        if (isSaving) return
         showErrors = true
         if (errors.hasErrors) return
+        isSaving = true
         onSave(
             initial.copy(
                 name = name.trim(),
@@ -108,7 +117,9 @@ fun ContactEditScreen(
                     }
                 },
                 actions = {
-                    TextButton(onClick = { save() }) { Text(stringResource(R.string.save)) }
+                    TextButton(onClick = { save() }, enabled = !isSaving) {
+                        Text(stringResource(R.string.save))
+                    }
                 },
             )
         },
@@ -213,6 +224,18 @@ fun ContactEditScreen(
         // The Material 3 date picker works in UTC milliseconds; we store the day as a LocalDate.
         val pickerState = rememberDatePickerState(
             initialSelectedDateMillis = birthday?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli(),
+            selectableDates = PastDatesOnly,
+        )
+        // Today's ring is only a guide: once a date is picked it goes away,
+        // so the picked date is the only one that stands out.
+        val nothingPicked = pickerState.selectedDateMillis == null
+        val pickerColors = DatePickerDefaults.colors(
+            todayDateBorderColor = if (nothingPicked) MaterialTheme.colorScheme.primary else Color.Transparent,
+            todayContentColor = if (nothingPicked) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.onSurface
+            },
         )
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
@@ -236,10 +259,21 @@ fun ContactEditScreen(
                     Text(stringResource(R.string.cancel))
                 }
             },
+            colors = pickerColors,
         ) {
-            DatePicker(state = pickerState)
+            DatePicker(state = pickerState, colors = pickerColors)
         }
     }
+}
+
+/** A birthday cannot be in the future, so the picker greys out the days after today. */
+@OptIn(ExperimentalMaterial3Api::class)
+private object PastDatesOnly : SelectableDates {
+    // The picker gives each day as midnight UTC in milliseconds, so today is compared the same way.
+    override fun isSelectableDate(utcTimeMillis: Long): Boolean =
+        utcTimeMillis <= LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
+
+    override fun isSelectableYear(year: Int): Boolean = year <= LocalDate.now().year
 }
 
 /** A text field with its label, and an error message underneath when [error] is not null. */
