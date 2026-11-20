@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -29,6 +28,9 @@ data class ContactListUiState(
     val query: String = "",
     val sortAscending: Boolean = true,
     val favoritesOnly: Boolean = false,
+    val recentSearches: List<String> = emptyList(),
+    /** true until the first database read finishes. */
+    val isLoading: Boolean = true,
 )
 
 /**
@@ -47,13 +49,17 @@ class ContactViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val searchResults: Flow<List<Contact>> = query.flatMapLatest { text -> contacts.search(text) }
 
+    // combine() takes at most five flows, so the two saved settings are joined into one pair first.
+    private val savedSettings: Flow<Pair<Boolean, List<String>>> =
+        combine(settings.sortAscending, settings.recentSearches) { ascending, recent -> ascending to recent }
+
     val listState: StateFlow<ContactListUiState> = combine(
         searchResults,
         contacts.groups,
         query,
-        settings.sortAscending,
+        savedSettings,
         favoritesOnly,
-    ) { found, groups, text, ascending, onlyFavorites ->
+    ) { found, groups, text, (ascending, recent), onlyFavorites ->
         val shown = if (onlyFavorites) found.filter { it.isFavorite } else found
         ContactListUiState(
             // The database already sorts A to Z; reverse the list for Z to A.
@@ -62,6 +68,8 @@ class ContactViewModel(
             query = text,
             sortAscending = ascending,
             favoritesOnly = onlyFavorites,
+            recentSearches = recent,
+            isLoading = false,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -81,14 +89,27 @@ class ContactViewModel(
         query.value = text
     }
 
+    /** Adds the current search text (if there is any) to the recent searches. */
+    fun saveCurrentSearch() {
+        val text = query.value.trim()
+        if (text.isEmpty()) return
+        viewModelScope.launch { settings.addRecentSearch(text) }
+    }
+
+    fun removeRecentSearch(text: String) {
+        viewModelScope.launch { settings.removeRecentSearch(text) }
+    }
+
+    fun clearRecentSearches() {
+        viewModelScope.launch { settings.clearRecentSearches() }
+    }
+
     fun onFavoritesOnlyChange(onlyFavorites: Boolean) {
         favoritesOnly.value = onlyFavorites
     }
 
     fun toggleSortOrder() {
-        viewModelScope.launch {
-            settings.setSortAscending(!settings.sortAscending.first())
-        }
+        viewModelScope.launch { settings.toggleSortOrder() }
     }
 
     fun toggleFavorite(contact: Contact) {
