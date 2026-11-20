@@ -70,7 +70,10 @@ fun PhotoPicker(
     }
 }
 
-/** Copies the picked image to files/photos/ and returns its path, or null if it fails. */
+/**
+ * Copies the picked image to files/photos/ and returns its path, or null if it fails.
+ * A half-copied file (for example when the phone is full) is deleted instead of being left behind.
+ */
 private fun copyToAppStorage(context: Context, uri: Uri): String? {
     val folder = File(context.filesDir, "photos").apply { mkdirs() }
     val file = File(folder, "${UUID.randomUUID()}.jpg")
@@ -79,6 +82,11 @@ private fun copyToAppStorage(context: Context, uri: Uri): String? {
         input.use { source -> file.outputStream().use { target -> source.copyTo(target) } }
         file.absolutePath
     } catch (e: IOException) {
+        file.delete()
+        null
+    } catch (e: SecurityException) {
+        // We are no longer allowed to read this picture.
+        file.delete()
         null
     }
 }
