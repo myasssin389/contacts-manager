@@ -26,6 +26,10 @@ interface ContactDao {
     @Query("SELECT * FROM contacts WHERE id = :id")
     fun getById(id: Long): Flow<Contact?>
 
+    // A one-time read (no Flow), for when the repository needs the saved row once.
+    @Query("SELECT * FROM contacts WHERE id = :id")
+    suspend fun findById(id: Long): Contact?
+
     @Query(
         "SELECT * FROM contacts " +
             "WHERE name LIKE '%' || :query || '%' OR phone LIKE '%' || :query || '%' " +
@@ -33,7 +37,8 @@ interface ContactDao {
     )
     fun search(query: String): Flow<List<Contact>>
 
-    @Query("SELECT * FROM contact_groups ORDER BY name")
+    // In the order they were added, so "Other" comes last.
+    @Query("SELECT * FROM contact_groups ORDER BY id")
     fun getGroups(): Flow<List<Group>>
 
     // Update
