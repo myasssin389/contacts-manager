@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 /**
- * A contact group such as Family, Work or University.
+ * A contact group: Family, Work, University or Other.
  * Groups live in their own table; each contact points to one with [Contact.groupId].
  */
 @Entity(tableName = "contact_groups")
