@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Dark mode version of the window theme. Without it the window background stays white,
+        and opening a screen in dark mode flashes white before Compose draws it.
+    -->
+    <style name="Theme.ContactsPhase1" parent="android:Theme.Material.NoActionBar" />
+</resources>
