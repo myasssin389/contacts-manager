@@ -10,28 +10,39 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ContactsPhase1">
 
-        <!-- The contact list. No screenOrientation lock, so it also works in landscape. -->
+        <!--
+            The contact list. No screenOrientation lock, so it also works in landscape.
+            adjustResize lets the screen know when the keyboard opens and closes,
+            so closing it with Back also takes the focus off the search box.
+        -->
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- Opened only from inside the app, with an explicit Intent. -->
+        <!--
+            Opened only from inside the app, with an explicit Intent.
+            singleTop: a quick double tap on a contact opens this screen once, not twice.
+        -->
         <activity
             android:name=".DetailActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:launchMode="singleTop" />
 
         <!--
             Add/edit form. The intent filter lets other apps share plain text with us
             (Share > contacts_phase1); the form then opens with the shared details filled in.
+            singleTop: a quick double tap on + or Edit opens the form once, not twice.
         -->
         <activity
             android:name=".EditContactActivity"
             android:exported="true"
+            android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
