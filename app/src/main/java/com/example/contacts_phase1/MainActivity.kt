@@ -32,6 +32,9 @@ class MainActivity : ComponentActivity() {
                     onToggleFavorite = viewModel::toggleFavorite,
                     onContactClick = { contact -> openDetail(contact.id) },
                     onAddClick = ::openNewContact,
+                    onSearch = viewModel::saveCurrentSearch,
+                    onRemoveRecentSearch = viewModel::removeRecentSearch,
+                    onClearRecentSearches = viewModel::clearRecentSearches,
                 )
             }
         }
